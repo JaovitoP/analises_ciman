@@ -123,14 +123,14 @@ def plot_annual_estados_graph(estado, df_anual, media_anual, desvio_anual, ano_i
 
     # Add the custom legend to the Z-index subplot with horizontal layout
     # Adjusted bbox_to_anchor to align to the left and ensure it's inside the figure
-    axes[1].legend(handles=legend_patches, loc='upper center', bbox_to_anchor=(0.5, -0.30),
+    axes[1].legend(handles=legend_patches, loc='upper center', bbox_to_anchor=(0.5, -0.20),
                         fancybox=True, shadow=True, ncol=2, title='Significado do Z-Index') # Changed ncol to 3
 
     # Adicionar a logo à figura
     # Calculate position for bottom-right corner, with some padding in pixels
     # Adicionar a logo à figura
     # Calculate position for bottom-right corner, with some padding in pixels
-    logo_ax = fig.add_axes([0.80, 0.01, 0.16, 0.16])
+    logo_ax = fig.add_axes([0.80, 0.01, 0.10, 0.10])
     logo_ax.imshow(img)
     logo_ax.axis('off')
 

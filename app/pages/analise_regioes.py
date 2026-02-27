@@ -44,29 +44,33 @@ with st.container(border=True):
         )
 
     if st.button('Gerar relatório'):
+        with st.spinner('Gerando relatório...'):
 
-        df_focos = ajusta_serie_temporal( preparar_focos('paises/brasil.csv') )
-        df_focos = df_focos[df_focos.index.year <  date.today().year].copy() #até ano anterior
-        df_focos_var, stats = calcula_z_index(df_focos, ano_i, ano_f) #Definir qual o período da climatologia
-        df_focos_var = df_focos_var.drop(columns=['mean', 'mes', 'std'])
+            lista_regioes = ["matopiba", "map", "amazonia_legal", "norte", "nordeste","centro_oeste","sul","sudeste"]
+            resultados = []
 
-        df_anual, media_anual, desvio_anual = calcula_z_anual(df_focos, ano_i, ano_f)
+            st.subheader("📊 Relatório")
 
-        lista_regioes = ["matopiba", "map", "amazonia_legal", "norte", "nordeste","centro_oeste","sul","sudeste"]
-        resultados = []
+            cols = st.columns(2)
 
-        for i in lista_regioes:
-            res = analisador_regiao(i, ano, ano_i, ano_f)
-            resultados.append(res)
-        st.dataframe(resultados)
-        df_regioes = pd.DataFrame(resultados)
+            for i, regiao in enumerate(lista_regioes):
+                col = cols[i % len(cols)] 
+                with col, st.container(border=True), st.spinner('Gerando gráfico...'):
+                    df_focos = ajusta_serie_temporal( preparar_focos(f'regioes/{regiao}.csv') )
+                    df_focos = df_focos[df_focos.index.year <  date.today().year].copy() #até ano anterior
+                    df_focos_var, stats = calcula_z_index(df_focos, ano_i, ano_f) #Definir qual o período da climatologia
+                    df_focos_var = df_focos_var.drop(columns=['mean', 'mes', 'std'])
+                    df_anual, media_anual, desvio_anual = calcula_z_anual(df_focos, ano_i, ano_f)
+                    res = analisador_regiao(regiao, ano, ano_i, ano_f)
+                    resultados.append(res)
+                    plot_annual_regioes_graph(regiao, df_anual, media_anual, desvio_anual, ano_i, ano_f)
 
-        cols = st.columns(2)
 
-        for idx, regiao in enumerate(lista_regioes):
-            col = cols[idx % 2]
+            df_regioes = pd.DataFrame(resultados)
 
-            with col, st.container(border=True), st.spinner('Gerando gráfico...'):
-                plot_annual_regioes_graph(
-                    regiao, df_anual, media_anual, desvio_anual, ano_i, ano_f
-                )
+            df_regioes[['Média histórica','Desvio histórico']] = (
+                df_regioes[['Média histórica','Desvio histórico']]
+                .round(0)
+                .astype('Int64')
+            )
+            st.dataframe(df_regioes)

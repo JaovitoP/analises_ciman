@@ -62,7 +62,7 @@ def plot_annual_biomas_graph(bioma, df_anual, media_anual, desvio_anual, ano_i, 
 
     img = mpimg.imread('assets/LogoINPEQmdPeq.png')
 
-    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(9, 7), sharex=True) # Increased figure height significantly
+    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(12, 12), sharex=True) # Increased figure height significantly
     bioma_nome = biomas_formatados.get(bioma, bioma).title()
     df_anual.focos_ano.plot(kind="bar", ax=axes[0], color='indianred', label='Focos Anuais', title=f'Série Histórica de Focos de calor no bioma {bioma_nome} - Climatologia {ano_i} - {ano_f}')
     axes[0].set_ylabel('Número de Focos')
@@ -102,14 +102,14 @@ def plot_annual_biomas_graph(bioma, df_anual, media_anual, desvio_anual, ano_i, 
 
     # Add the custom legend to the Z-index subplot with horizontal layout
     # Adjusted bbox_to_anchor to align to the left and ensure it's inside the figure
-    axes[1].legend(handles=legend_patches, loc='upper center', bbox_to_anchor=(0.5, -0.30),
+    axes[1].legend(handles=legend_patches, loc='upper center', bbox_to_anchor=(0.5, -0.20),
                         fancybox=True, shadow=True, ncol=2, title='Significado do Z-Index') # Changed ncol to 3
 
     # Adicionar a logo à figura
     # Calculate position for bottom-right corner, with some padding in pixels
     # Adicionar a logo à figura
     # Calculate position for bottom-right corner, with some padding in pixels
-    logo_ax = fig.add_axes([0.80, 0.01, 0.16, 0.16])
+    logo_ax = fig.add_axes([0.80, 0.01, 0.16, 0.10])
     logo_ax.imshow(img)
     logo_ax.axis('off')
 

@@ -44,29 +44,34 @@ with st.container(border=True):
         )
 
     if st.button('Gerar relatório'):
+        with st.spinner('Gerando relatório...'):
 
-        df_focos = ajusta_serie_temporal( preparar_focos('paises/brasil.csv') )
-        df_focos = df_focos[df_focos.index.year <  date.today().year].copy() #até ano anterior
-        df_focos_var, stats = calcula_z_index(df_focos, ano_i, ano_f) #Definir qual o período da climatologia
-        df_focos_var = df_focos_var.drop(columns=['mean', 'mes', 'std'])
+            lista_estados = ["acre", "alagoas", "amapa", "amazonas", "bahia", "ceara", "distrito_federal", "espirito_santo", "goias", "maranhao", "mato_grosso_do_sul", "mato_grosso", "minas_gerais", "para", "paraiba", "parana", "pernambuco", "piaui", "rio_de_janeiro", "rio_grande_do_norte", "rio_grande_do_sul", "rondonia", "roraima", "santa_catarina", "sao_paulo", "sergipe", "tocantins"]
+            resultados = []
 
-        df_anual, media_anual, desvio_anual = calcula_z_anual(df_focos, ano_i, ano_f)
+            st.subheader("📊 Relatório")
+            cols = st.columns(2)
 
-        lista_estados = ["acre", "alagoas", "amapa", "amazonas", "bahia", "ceara", "distrito_federal", "espirito_santo", "goias", "maranhao", "mato_grosso_do_sul", "mato_grosso", "minas_gerais", "para", "paraiba", "parana", "pernambuco", "piaui", "rio_de_janeiro", "rio_grande_do_norte", "rio_grande_do_sul", "rondonia", "roraima", "santa_catarina", "sao_paulo", "sergipe", "tocantins"]
-        resultados = []
 
-        for i in lista_estados:
-            res = analisador_estado(i, ano, ano_i, ano_f)
-            resultados.append(res)
-        st.dataframe(resultados)
-        df_estados = pd.DataFrame(resultados)
+            for i, estado in enumerate(lista_estados):
+                    col = cols[i % len(cols)] 
+                    with col, st.container(border=True), st.spinner('Gerando gráfico...'):
+                        df_focos = ajusta_serie_temporal(preparar_focos(f"estados/{estado}.csv"))
+                        df_focos = df_focos[df_focos.index.year <  date.today().year].copy() #até ano anterior
+                        df_focos_var, stats = calcula_z_index(df_focos, ano_i, ano_f) #Definir qual o período da climatologia
+                        df_focos_var = df_focos_var.drop(columns=['mean', 'mes', 'std'])
+                        
+                        df_anual, media_anual, desvio_anual = calcula_z_anual(df_focos, ano_i, ano_f)
+                        res = analisador_estado(estado, ano, ano_i, ano_f)
+                        resultados.append(res)
 
-        cols = st.columns(2)
+                        plot_annual_estados_graph(estado, df_anual, media_anual, desvio_anual, ano_i, ano_f)
+                
+            df_estados = pd.DataFrame(resultados)
 
-        for idx, estado in enumerate(lista_estados):
-            col = cols[idx % 2]
-
-            with col, st.container(border=True), st.spinner('Gerando gráfico...'):
-                plot_annual_estados_graph(
-                    estado, df_anual, media_anual, desvio_anual, ano_i, ano_f
-                )
+            df_estados[['Média histórica','Desvio histórico']] = (
+                df_estados[['Média histórica','Desvio histórico']]
+                .round(0)
+                .astype('Int64')
+            )
+            st.dataframe(df_estados)

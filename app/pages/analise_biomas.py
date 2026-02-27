@@ -44,29 +44,33 @@ with st.container(border=True):
         )
 
     if st.button('Gerar relatório'):
+        with st.spinner('Gerando relatório...'):
 
-        df_focos = ajusta_serie_temporal( preparar_focos('paises/brasil.csv') )
-        df_focos = df_focos[df_focos.index.year <  date.today().year].copy() #até ano anterior
-        df_focos_var, stats = calcula_z_index(df_focos, ano_i, ano_f) #Definir qual o período da climatologia
-        df_focos_var = df_focos_var.drop(columns=['mean', 'mes', 'std'])
+            lista_biomas = ["amazonia", "cerrado", "pantanal", "caatinga", "mata_atlantica","pampa"]
+            resultados = []
 
-        df_anual, media_anual, desvio_anual = calcula_z_anual(df_focos, ano_i, ano_f)
+            st.subheader("📊 Relatório")
 
-        lista_biomas = ["amazonia", "cerrado", "pantanal", "caatinga", "mata_atlantica","pampa"]
-        resultados = []
+            cols = st.columns(2)
 
-        for i in lista_biomas:
-            res = analisador_bioma(i, ano, ano_i, ano_f)
-            resultados.append(res)
-        st.dataframe(resultados)
-        df_biomas = pd.DataFrame(resultados)
+            for i, bioma in enumerate(lista_biomas):
+                col = cols[i % len(cols)] 
+                with col, st.container(border=True), st.spinner('Gerando gráfico...'):
+                    df_focos = ajusta_serie_temporal(preparar_focos(f"biomas/{bioma}.csv"))
+                    df_focos = df_focos[df_focos.index.year < date.today().year].copy()  # até o ano anterior
+                    df_focos_var, stats = calcula_z_index(df_focos, ano_i, ano_f)  # Período da climatologia
+                    df_focos_var = df_focos_var.drop(columns=['mean', 'mes', 'std'])
+                    df_anual, media_anual, desvio_anual = calcula_z_anual(df_focos, ano_i, ano_f)
+                    res = analisador_bioma(bioma, ano, ano_i, ano_f)
+                    resultados.append(res)
+                    plot_annual_biomas_graph(bioma, df_anual, media_anual, desvio_anual, ano_i, ano_f)
 
-        cols = st.columns(2)
+            df_biomas = pd.DataFrame(resultados)
 
-        for idx, bioma in enumerate(lista_biomas):
-            col = cols[idx % 2]
+            df_biomas[['Média histórica','Desvio histórico']] = (
+                df_biomas[['Média histórica','Desvio histórico']]
+                .round(0)
+                .astype('Int64')
+            )
+            st.dataframe(df_biomas)
 
-            with col, st.container(border=True), st.spinner('Gerando gráfico...'):
-                plot_annual_biomas_graph(
-                    bioma, df_anual, media_anual, desvio_anual, ano_i, ano_f
-                )
