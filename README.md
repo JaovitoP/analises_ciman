@@ -8,7 +8,7 @@
 ## 📌Objetivo do Projeto
 
 > [!IMPORTANT]
-> Descrição do projeto
+> Este projeto tem como objetivo analisar e comparar dados de focos de incêndio no Brasil em diferentes anos, podendo esses dados serem exibidos por biomas, regiões ou estados. A aplicação permite que o usuário filtre os dados por ano e visualize-os em uma tabela. Além disso, é possível selecionar um intervalo de anos (ano de início e de fim) para a visualização em gráficos de barras.
 
 
 <span id="tecnologias"> 
