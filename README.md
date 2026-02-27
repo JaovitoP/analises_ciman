@@ -34,19 +34,20 @@
 #### **1. Clone o repositório**
 
 ```bash
-git clone (inserir link)
+git clone https://github.com/JaovitoP/analises_ciman.git 
 cd app
 ```
 
 #### **2. Setup**
 
 ```bash
+# Criar ambiente virtual
 python -m venv venv
 
-#Se estiver no linux
+# Ativar ambiente no linux
 source .venv/bin/activate
 
-#Se estiver no Windows (PowerShell)
+# Ativar ambiente no Windows (PowerShell)
 .venv\Scripts\Activate.ps1
 
 pip install -r requirements.txt
