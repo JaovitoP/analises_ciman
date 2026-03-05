@@ -2,22 +2,20 @@ import streamlit as st
 from utils.estados import *
 from utils.brasil import *
 from datetime import date
-from components.ui import gradient_divider, logo
+from components.header import header
 
-st.set_page_config(
-    layout='wide',
-    page_icon='🗺️'
-)
+years = get_years()
 
-years = [year for year in range(1998, 2026)]
+lista_estados = [
+    "acre", "alagoas", "amapa", "amazonas", "bahia", "ceara", 
+    "distrito_federal", "espirito_santo", "goias", "maranhao", 
+    "mato_grosso_do_sul", "mato_grosso", "minas_gerais", "para", 
+    "paraiba", "parana", "pernambuco", "piaui", "rio_de_janeiro", 
+    "rio_grande_do_norte", "rio_grande_do_sul", "rondonia", "roraima", 
+    "santa_catarina", "sao_paulo", "sergipe", "tocantins"
+]
 
-with open('style.css') as f:
-    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-
-logo_col, menu_col = st.columns([1, 3])
-
-gradient_divider()
-logo()
+header()
 
 with st.container(border=True):
     st.header('Analisador de focos por Estados')
@@ -28,50 +26,74 @@ with st.container(border=True):
         ano = st.selectbox(
             label="Selecione o ano",
             options=years,
+            index=len(years) -1
         )
+       
     with col2:
+        default_year = 2010
         ano_i = st.selectbox(
             label="Selecione o ano de início",
-            options=years
+            options=years,
+            index=years.index(default_year)
         )
     
     available_years = [y for y in years if y >= ano_i + 2]
 
     with col3:
+        default_year = 2024
         ano_f = st.selectbox(
             label="Selecione o ano de fim",
-            options=available_years
+            options=available_years,
+            index=available_years.index(default_year) if default_year in available_years else 0
+        )
+    estados_selecionados = st.multiselect(
+            label="Selecione os estados",
+            placeholder="Seleciones os estados",
+            options=lista_estados,
+            format_func=lambda x: x.replace("_", " ").capitalize()
         )
 
-    if st.button('Gerar relatório'):
-        with st.spinner('Gerando relatório...'):
 
-            lista_estados = ["acre", "alagoas", "amapa", "amazonas", "bahia", "ceara", "distrito_federal", "espirito_santo", "goias", "maranhao", "mato_grosso_do_sul", "mato_grosso", "minas_gerais", "para", "paraiba", "parana", "pernambuco", "piaui", "rio_de_janeiro", "rio_grande_do_norte", "rio_grande_do_sul", "rondonia", "roraima", "santa_catarina", "sao_paulo", "sergipe", "tocantins"]
-            resultados = []
+if st.button('Gerar relatório'):
+    if not estados_selecionados:
+        st.warning("Selecione pelo menos um estado.")
+        st.stop()
+    with st.spinner('Gerando relatório...'):
 
-            st.subheader("📊 Relatório")
-            cols = st.columns(2)
+        resultados = []
+        dados_graficos = []
 
+        st.subheader("📊 Relatório")
+        for estado in estados_selecionados:
+            df_focos = ajusta_serie_temporal(preparar_focos(f"estados/{estado}.csv"))
+            df_focos = df_focos[df_focos.index.year <= date.today().year].copy()
 
-            for i, estado in enumerate(lista_estados):
-                    col = cols[i % len(cols)] 
-                    with col, st.container(border=True), st.spinner('Gerando gráfico...'):
-                        df_focos = ajusta_serie_temporal(preparar_focos(f"estados/{estado}.csv"))
-                        df_focos = df_focos[df_focos.index.year <  date.today().year].copy() #até ano anterior
-                        df_focos_var, stats = calcula_z_index(df_focos, ano_i, ano_f) #Definir qual o período da climatologia
-                        df_focos_var = df_focos_var.drop(columns=['mean', 'mes', 'std'])
-                        
-                        df_anual, media_anual, desvio_anual = calcula_z_anual(df_focos, ano_i, ano_f)
-                        res = analisador_estado(estado, ano, ano_i, ano_f)
-                        resultados.append(res)
+            df_focos_var, stats = calcula_z_index(df_focos, ano_i, ano_f)
+            df_anual, media_anual, desvio_anual = calcula_z_anual(df_focos, ano_i, ano_f)
+            df_anual_plot = df_anual.loc[(df_anual.index >= ano_i) & (df_anual.index <= ano_f)]
 
-                        plot_annual_estados_graph(estado, df_anual, media_anual, desvio_anual, ano_i, ano_f)
-                
-            df_estados = pd.DataFrame(resultados)
+            res = analisador_estado(estado, ano, ano_i, ano_f)
+            resultados.append(res)
 
-            df_estados[['Média histórica','Desvio histórico']] = (
-                df_estados[['Média histórica','Desvio histórico']]
-                .round(0)
-                .astype('Int64')
-            )
-            st.dataframe(df_estados)
+            dados_graficos.append((estado, df_anual, media_anual, desvio_anual))
+
+        df_estados = pd.DataFrame(resultados)
+        df_estados[['Média histórica','Desvio histórico']] = (
+            df_estados[['Média histórica','Desvio histórico']]
+            .round(0)
+            .astype('Int64')
+        )
+        st.dataframe(df_estados)
+
+        cols = st.columns(2)
+        for i, (estado, df_anual, media_anual, desvio_anual) in enumerate(dados_graficos):
+            col = cols[i % len(cols)]
+            with col, st.container(border=True), st.spinner('Gerando gráfico...'):
+                plot_annual_estados_graph(
+                    estado,
+                    df_anual_plot,
+                    media_anual,
+                    desvio_anual,
+                    ano_i,
+                    ano_f
+                )

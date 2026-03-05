@@ -40,7 +40,7 @@ estados_formatados = {
 def analisador_estado(estado, ano, ano_i, ano_f):
     url_focos_estado = f"estados/{estado}.csv"
     df_focos = ajusta_serie_temporal( preparar_focos(url_focos_estado) )
-    df_focos = df_focos[df_focos.index.year < date.today().year].copy() #até
+    df_focos = df_focos[df_focos.index.year <= date.today().year].copy() #até
     estado_nome = estados_formatados.get(estado, estado)
     df_anual, media_anual, desvio_anual = calcula_z_anual(df_focos, ano_i, ano_f) # ANUAL
     df_focos_mes, stats_mes = calcula_z_index(df_focos, ano_i, ano_f) #MENSAL

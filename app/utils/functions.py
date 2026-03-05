@@ -6,8 +6,13 @@ import os # Import os module to handle file cleanup
 import pandas as pd
 import numpy as np
 import matplotlib.patches as mpatches
+import streamlit as st
 
 url_base = 'https://data.inpe.br/queimadas/portal/csv/download/historico-mensal/'
+
+
+def get_years():
+    return [year for year in range(1998, 2027)]
 
 def preparar_focos(link):
   # Faz a leitura do arquivo CSV direto da URL
@@ -42,11 +47,12 @@ def ajusta_serie_temporal(df_focos):
   df_focos = df_focos.set_index(pd.PeriodIndex(df_focos['data_str'], freq='M'))
 
   # Filtro Temporal
+  #to do: filtrar por ano selecionado
   df_focos = df_focos[df_focos.index >= '1998-06']
 
   # Remover as colunas auxiliares
   df_focos = df_focos.drop(columns=['ano', 'mes', 'mes_num', 'data_str'])
-
+  
   return df_focos
 
 
