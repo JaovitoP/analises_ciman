@@ -4,6 +4,7 @@ from utils.functions import *
 from utils.biomas import *
 from utils.brasil import *
 from components.header import header
+from components.warnings import choose_ano_i_warning
 
 years = get_years()
 
@@ -43,6 +44,8 @@ with st.container(border=True):
         )
 
     if st.button('Gerar relatório'):
+        if not ano_f:
+            choose_ano_i_warning()
         st.subheader("📊 Relatório")
         cols = st.columns([4, 5])
 

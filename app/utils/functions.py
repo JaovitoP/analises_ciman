@@ -116,6 +116,8 @@ def tabela_relatorio(df_focos_var, stats, ano):
         f'Dif. relativa (%) {ano-1}'
     ]]
 
+    df_tab = df_tab[df_tab[f'Focos {ano}'].fillna(0) != 0]
+
     return df_tab
 
 
