@@ -5,7 +5,8 @@ def header():
 
     st.set_page_config(
         layout='wide',
-        page_icon='🗺️'
+        page_icon='🗺️',
+        initial_sidebar_state="expanded"
     )
 
     with open('style.css') as f:

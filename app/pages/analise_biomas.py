@@ -3,40 +3,36 @@ from utils.biomas import *
 from utils.brasil import *
 from datetime import date
 from components.header import header
+from components.warnings import choose_ano_i_warning
 
 years = get_years()
 lista_biomas = ["amazonia", "cerrado", "pantanal", "caatinga", "mata_atlantica","pampa"]
 
 header()
 
-with st.container(border=True):
-    st.header('Analisador de focos por Biomas')
+st.header('Analisador de focos por Biomas')
+with st.sidebar:
 
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        ano = st.selectbox(
-            label="Selecione o ano",
-            options=years,
-            index=len(years) -1
-        )
-    with col2:
-        default_year = 2010
-        ano_i = st.selectbox(
-            label="Selecione o ano de início",
-            options=years,
-            index=years.index(default_year)
-        )
+    ano = st.selectbox(
+        label="Selecione o ano",
+        options=years,
+        index=len(years) -1
+    )
+    default_year = 2010
+    ano_i = st.selectbox(
+        label="Selecione o ano de início",
+        options=years,
+        index=years.index(default_year)
+    )
     
     available_years = [y for y in years if y >= ano_i + 2]
 
-    with col3:
-        default_year = 2024
-        ano_f = st.selectbox(
-            label="Selecione o ano de fim",
-            options=available_years,
-            index=available_years.index(default_year) if default_year in available_years else 0
-        )
+    default_year = 2024
+    ano_f = st.selectbox(
+        label="Selecione o ano de fim",
+        options=available_years,
+        index=available_years.index(default_year) if default_year in available_years else 0
+    )
 
     biomas_selecionados = st.multiselect(
         label="Selecione os biomas",
@@ -45,10 +41,14 @@ with st.container(border=True):
         format_func= lambda x: x.replace("_", " ").capitalize()
     )
 
-if st.button('Gerar relatório'):
+    if st.button('Gerar relatório'):
+        st.session_state["gerar_relatorio_biomas"] = True
+if st.session_state.get("gerar_relatorio_biomas"):
     if not biomas_selecionados:
         st.warning("Selecione pelo menos um bioma.")
         st.stop()
+    if not ano_f:
+        choose_ano_i_warning()
     with st.spinner('Gerando relatório...'):
 
         resultados = []
@@ -67,7 +67,7 @@ if st.button('Gerar relatório'):
             res = analisador_bioma(bioma, ano, ano_i, ano_f)
             resultados.append(res)
 
-            dados_graficos.append((bioma, df_anual, media_anual, desvio_anual))
+            dados_graficos.append((bioma, df_anual_plot, media_anual, desvio_anual))
 
         df_biomas = pd.DataFrame(resultados)
 
@@ -81,7 +81,7 @@ if st.button('Gerar relatório'):
 
         cols = st.columns(2)
 
-        for i, (bioma, df_anual, media_anual, desvio_anual) in enumerate(dados_graficos):
+        for i, (bioma, df_anual_plot, media_anual, desvio_anual) in enumerate(dados_graficos):
             col = cols[i % len(cols)]
             with col, st.container(border=True), st.spinner('Gerando gráfico...'):
                 plot_annual_biomas_graph(

@@ -17,35 +17,30 @@ lista_estados = [
 
 header()
 
-with st.container(border=True):
-    st.header('Analisador de focos por Estados')
+st.header('Analisador de focos por Estados')
+with st.sidebar:
 
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        ano = st.selectbox(
-            label="Selecione o ano",
-            options=years,
-            index=len(years) -1
-        )
-       
-    with col2:
-        default_year = 2010
-        ano_i = st.selectbox(
-            label="Selecione o ano de início",
-            options=years,
-            index=years.index(default_year)
-        )
+    ano = st.selectbox(
+        label="Selecione o ano",
+        options=years,
+        index=len(years) -1
+    )
+    
+    default_year = 2010
+    ano_i = st.selectbox(
+        label="Selecione o ano de início",
+        options=years,
+        index=years.index(default_year)
+    )
     
     available_years = [y for y in years if y >= ano_i + 2]
 
-    with col3:
-        default_year = 2024
-        ano_f = st.selectbox(
-            label="Selecione o ano de fim",
-            options=available_years,
-            index=available_years.index(default_year) if default_year in available_years else 0
-        )
+    default_year = 2024
+    ano_f = st.selectbox(
+        label="Selecione o ano de fim",
+        options=available_years,
+        index=available_years.index(default_year) if default_year in available_years else 0
+    )
     estados_selecionados = st.multiselect(
             label="Selecione os estados",
             placeholder="Seleciones os estados",
@@ -53,11 +48,15 @@ with st.container(border=True):
             format_func=lambda x: x.replace("_", " ").capitalize()
         )
 
+    if st.button('Gerar relatório'):
+        st.session_state["gerar_relatorio_estados"] = True
 
-if st.button('Gerar relatório'):
+if st.session_state.get("gerar_relatorio_estados"):
     if not estados_selecionados:
         st.warning("Selecione pelo menos um estado.")
         st.stop()
+    if not ano_f:
+        choose_ano_i_warning()
     with st.spinner('Gerando relatório...'):
 
         resultados = []
@@ -75,7 +74,7 @@ if st.button('Gerar relatório'):
             res = analisador_estado(estado, ano, ano_i, ano_f)
             resultados.append(res)
 
-            dados_graficos.append((estado, df_anual, media_anual, desvio_anual))
+            dados_graficos.append((estado, df_anual_plot, media_anual, desvio_anual))
 
         df_estados = pd.DataFrame(resultados)
         df_estados[['Média histórica','Desvio histórico']] = (
@@ -86,7 +85,7 @@ if st.button('Gerar relatório'):
         st.dataframe(df_estados)
 
         cols = st.columns(2)
-        for i, (estado, df_anual, media_anual, desvio_anual) in enumerate(dados_graficos):
+        for i, (estado, df_anual_plot, media_anual, desvio_anual) in enumerate(dados_graficos):
             col = cols[i % len(cols)]
             with col, st.container(border=True), st.spinner('Gerando gráfico...'):
                 plot_annual_estados_graph(
