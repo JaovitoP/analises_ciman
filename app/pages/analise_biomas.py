@@ -54,20 +54,31 @@ if st.session_state.get("gerar_relatorio_biomas"):
         resultados = []
         dados_graficos = []
 
-        st.subheader("📊 Relatório")
+        st.subheader(f'📊 Relatório de {ano}')
+        tabelas_biomas = {}
 
+
+        # Tabela
+        for bioma in lista_biomas:
+            df_focos = ajusta_serie_temporal(preparar_focos(f"biomas/{bioma}.csv"))
+            df_focos = df_focos[df_focos.index.year <= date.today().year].copy()
+
+            res, tabela_bioma = analisador_bioma(bioma, ano, ano_i, ano_f)
+            resultados.append(res)
+            tabelas_biomas[bioma] = tabela_bioma
+
+
+        # Gráficos
         for bioma in biomas_selecionados:
             df_focos = ajusta_serie_temporal(preparar_focos(f"biomas/{bioma}.csv"))
             df_focos = df_focos[df_focos.index.year <= date.today().year].copy()
 
-            df_focos_var, stats = calcula_z_index(df_focos, ano_i, ano_f)
             df_anual, media_anual, desvio_anual = calcula_z_anual(df_focos, ano_i, ano_f)
-            df_anual_plot = df_anual.loc[(df_anual.index >= ano_i) & (df_anual.index <= ano_f)]
+            df_anual_plot = df_anual
 
-            res = analisador_bioma(bioma, ano, ano_i, ano_f)
-            resultados.append(res)
+            tabela_bioma = tabelas_biomas[bioma]
 
-            dados_graficos.append((bioma, df_anual_plot, media_anual, desvio_anual))
+            dados_graficos.append((bioma, df_anual_plot, media_anual, desvio_anual, tabela_bioma))
 
         df_biomas = pd.DataFrame(resultados)
 
@@ -77,11 +88,19 @@ if st.session_state.get("gerar_relatorio_biomas"):
             .astype('Int64')
         )
 
-        st.dataframe(df_biomas)
+        num_cols = df_biomas.select_dtypes(include='number').columns
+
+        df_biomas_style = (
+            df_biomas
+            .style
+            .apply(cor_linha, axis=1, ano=ano)
+            .format({col: formato_br for col in num_cols})
+        )
+        st.dataframe(df_biomas_style)
 
         cols = st.columns(2)
 
-        for i, (bioma, df_anual_plot, media_anual, desvio_anual) in enumerate(dados_graficos):
+        for i, (bioma, df_anual_plot, media_anual, desvio_anual, tabela_bioma) in enumerate(dados_graficos):
             col = cols[i % len(cols)]
             with col, st.container(border=True), st.spinner('Gerando gráfico...'):
                 plot_annual_biomas_graph(
@@ -92,4 +111,6 @@ if st.session_state.get("gerar_relatorio_biomas"):
                     ano_i,
                     ano_f
                 )
+
+                st.dataframe(tabela_bioma, use_container_width=True)
 

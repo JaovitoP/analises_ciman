@@ -47,7 +47,7 @@ def analisador_regiao(regiao, ano, ano_i, ano_f):
     interpretacao = interpreta_z(z_ano)
 
     # --- montar resultado ---
-    return {
+    resultado = {
         'Região': regiao_nome,
         f'Focos {ano}': focos_ano,
         'Média histórica': media_anual,
@@ -58,6 +58,8 @@ def analisador_regiao(regiao, ano, ano_i, ano_f):
         f'Focos {ano-1}': focos_anterior,
         f'Dif. relativa (%) {ano-1}': dif_anterior
     }
+
+    return resultado, tabela_regiao
 
 def plot_annual_regioes_graph(regiao, df_anual, media_anual, desvio_anual, ano_i, ano_f):
 

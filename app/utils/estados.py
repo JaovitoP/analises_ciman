@@ -67,7 +67,7 @@ def analisador_estado(estado, ano, ano_i, ano_f):
     interpretacao = interpreta_z(z_ano)
 
     # --- montar resultado ---
-    return {
+    resultado = {
         'Estado': estado_nome,
         f'Focos {ano}': focos_ano,
         'Média histórica': media_anual,
@@ -78,6 +78,7 @@ def analisador_estado(estado, ano, ano_i, ano_f):
         f'Focos {ano-1}': focos_anterior,
         f'Dif. relativa (%) {ano-1}': dif_anterior
     }
+    return resultado, tabela_estado
 
 def plot_annual_estados_graph(estado, df_anual, media_anual, desvio_anual, ano_i, ano_f):
 

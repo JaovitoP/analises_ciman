@@ -27,12 +27,20 @@ def analisador_bioma(bioma, ano, ano_i, ano_f):
     # Tabela mensal
     tabela = tabela_relatorio(df_focos_mes, stats_mes, ano)
     num_cols = tabela.select_dtypes(include='number').columns
+    tabela_bioma = pd.DataFrame(tabela)
+    tabela_bioma[['Média histórica','Desvio histórico']] = (
+        tabela_bioma[['Média histórica','Desvio histórico']]
+        .round(0)
+        .astype('Int64')
+    )
+
     tabela_bioma = (
-        tabela
+        tabela_bioma
         .style
         .apply(cor_linha, axis=1, ano=ano)
         .format({col: formato_br for col in num_cols})
     )
+
 
     # --- pegar valores anuais ---
     focos_ano = df_anual.loc[ano, 'focos_ano'] if ano in df_anual.index else np.nan
@@ -46,7 +54,7 @@ def analisador_bioma(bioma, ano, ano_i, ano_f):
     interpretacao = interpreta_z(z_ano)
 
     # --- montar resultado ---
-    return {
+    resultado = {
         'Bioma': bioma_nome,
         f'Focos {ano}': focos_ano,
         'Média histórica': media_anual,
@@ -57,6 +65,7 @@ def analisador_bioma(bioma, ano, ano_i, ano_f):
         f'Focos {ano-1}': focos_anterior,
         f'Dif. relativa (%) {ano-1}': dif_anterior
     }
+    return resultado, tabela_bioma
 
 def plot_annual_biomas_graph(bioma, df_anual, media_anual, desvio_anual, ano_i, ano_f):
 

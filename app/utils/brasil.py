@@ -52,7 +52,7 @@ def plot_annual_graph(df_anual, media_anual, desvio_anual, ano_i, ano_f):
 
     # Adicionar a logo à figura
     # Calculate position for bottom-right corner, with some padding in pixels
-    logo_ax = fig.add_axes([0.80, 0.01, 0.14, 0.14])
+    logo_ax = fig.add_axes([0.80, 0.01, 0.14, 0.10])
     logo_ax.imshow(img)
     logo_ax.axis('off')
 
