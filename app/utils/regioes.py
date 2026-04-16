@@ -5,7 +5,7 @@ import matplotlib.image as mpimg
 import matplotlib.patches as mpatches
 import streamlit as st
 import matplotlib.image as mpimg
-from datetime import date
+from datetime import date, datetime
 
 regioes_formatadas = {
     'amazonia_legal': 'Amazônia Legal',
@@ -22,11 +22,13 @@ def analisador_regiao(regiao, ano, ano_i, ano_f):
     df_focos = ajusta_serie_temporal( preparar_focos(url_focos_regiao) )
     df_focos = df_focos[df_focos.index.year <= date.today().year].copy() #até
     regiao_nome = regioes_formatadas.get(regiao, regiao)
-    df_anual, media_anual, desvio_anual = calcula_z_anual(df_focos, ano_i, ano_f) # ANUAL
+    df_anual, media_anual, desvio_anual, mes_final = calcula_z_anual(df_focos, ano_i, ano_f, ano_selecionado=ano) # ANUAL
     df_focos_mes, stats_mes = calcula_z_index(df_focos, ano_i, ano_f) #MENSAL
 
     # Tabela mensal
     tabela = tabela_relatorio(df_focos_mes, stats_mes, ano)
+    tabela[['Média histórica','Desvio histórico']] = tabela[['Média histórica','Desvio histórico']].astype(int)
+
     num_cols = tabela.select_dtypes(include='number').columns
     tabela_regiao = (
         tabela
@@ -61,7 +63,12 @@ def analisador_regiao(regiao, ano, ano_i, ano_f):
 
     return resultado, tabela_regiao
 
-def plot_annual_regioes_graph(regiao, df_anual, media_anual, desvio_anual, ano_i, ano_f):
+def plot_annual_regioes_graph(regiao, df_anual, media_anual, desvio_anual, ano_i, ano_f, ano_selecionado=None):
+
+    ano_atual = date.today().year
+
+    if ano_selecionado != ano_atual:
+        df_anual = df_anual[df_anual.index != ano_atual]
 
     img = mpimg.imread('assets/LogoINPEQmdPeq.png')
 

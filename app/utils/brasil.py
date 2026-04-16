@@ -1,10 +1,18 @@
+from datetime import date, datetime
+
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import matplotlib.patches as mpatches
 import pandas as pd
 import streamlit as st
 
-def plot_annual_graph(df_anual, media_anual, desvio_anual, ano_i, ano_f):
+def plot_annual_graph(df_anual, media_anual, desvio_anual, ano_i, ano_f, ano_selecionado=None):
+
+    ano_atual = date.today().year
+
+    if ano_selecionado != ano_atual:
+        df_anual = df_anual[df_anual.index != ano_atual]
+
     img = mpimg.imread('assets/LogoINPEQmdPeq.png')
 
     fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(12, 12), sharex=True) # Increased figure height significantly

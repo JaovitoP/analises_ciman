@@ -21,18 +21,14 @@ def analisador_bioma(bioma, ano, ano_i, ano_f):
     df_focos = ajusta_serie_temporal( preparar_focos(url_focos_bioma))
     df_focos = df_focos[df_focos.index.year <= date.today().year].copy() #até
     bioma_nome = biomas_formatados.get(bioma, bioma).title()
-    df_anual, media_anual, desvio_anual = calcula_z_anual(df_focos, ano_i, ano_f) # ANUAL
+    df_anual, media_anual, desvio_anual, mes_final = calcula_z_anual(df_focos, ano_i, ano_f, ano_selecionado=ano) # ANUAL
     df_focos_mes, stats_mes = calcula_z_index(df_focos, ano_i, ano_f) #MENSAL
 
     # Tabela mensal
     tabela = tabela_relatorio(df_focos_mes, stats_mes, ano)
     num_cols = tabela.select_dtypes(include='number').columns
     tabela_bioma = pd.DataFrame(tabela)
-    tabela_bioma[['Média histórica','Desvio histórico']] = (
-        tabela_bioma[['Média histórica','Desvio histórico']]
-        .round(0)
-        .astype('Int64')
-    )
+    tabela_bioma[['Média histórica','Desvio histórico']] = tabela_bioma[['Média histórica','Desvio histórico']].astype(int)
 
     tabela_bioma = (
         tabela_bioma
@@ -40,7 +36,6 @@ def analisador_bioma(bioma, ano, ano_i, ano_f):
         .apply(cor_linha, axis=1, ano=ano)
         .format({col: formato_br for col in num_cols})
     )
-
 
     # --- pegar valores anuais ---
     focos_ano = df_anual.loc[ano, 'focos_ano'] if ano in df_anual.index else np.nan
@@ -67,7 +62,12 @@ def analisador_bioma(bioma, ano, ano_i, ano_f):
     }
     return resultado, tabela_bioma
 
-def plot_annual_biomas_graph(bioma, df_anual, media_anual, desvio_anual, ano_i, ano_f):
+def plot_annual_biomas_graph(bioma, df_anual, media_anual, desvio_anual, ano_i, ano_f, ano_selecionado=None):
+
+    ano_atual = date.today().year
+
+    if ano_selecionado != ano_atual:
+        df_anual = df_anual[df_anual.index != ano_atual]
 
     img = mpimg.imread('assets/LogoINPEQmdPeq.png')
 

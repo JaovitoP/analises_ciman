@@ -1,4 +1,5 @@
 #bibliotecas
+from datetime import date, datetime
 import pandas as pd
 import matplotlib.image as mpimg
 import urllib.request
@@ -47,8 +48,9 @@ def ajusta_serie_temporal(df_focos):
   df_focos = df_focos.set_index(pd.PeriodIndex(df_focos['data_str'], freq='M'))
 
   # Filtro Temporal
-  #to do: filtrar por ano selecionado
   df_focos = df_focos[df_focos.index >= '1998-06']
+
+  df_focos = df_focos[df_focos.index < pd.Period(datetime.now(), freq='M')]
 
   # Remover as colunas auxiliares
   df_focos = df_focos.drop(columns=['ano', 'mes', 'mes_num', 'data_str'])
@@ -168,6 +170,10 @@ def formato_br(x):
         return f"{int(x):,}".replace(",", ".")
     return f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
+def mes_disponivel():
+    hoje = datetime.now()
+    return hoje.month - 1 if hoje.month > 1 else 12
+
 
 def calcula_z_index(df_focos, ano_inicio, ano_fim):
 
@@ -190,27 +196,44 @@ def calcula_z_index(df_focos, ano_inicio, ano_fim):
 
     return df, stats
 
-def calcula_z_anual(df_focos, ano_inicio, ano_fim):
-    """
-    df_focos: DataFrame com índice datetime/PeriodIndex e coluna 'focos'
-    """
-
+def calcula_z_anual(df_focos, ano_inicio, ano_fim, ano_selecionado=None):
     df = df_focos.copy()
+    
+    ano_atual = date.today().year
+    ultimo_mes = mes_disponivel()
+    
+    df['ano'] = df.index.year
+    df['mes'] = df.index.month
 
-    # garantir ano
-    anos = df.index.year
+    if ano_selecionado is None or ano_selecionado < ano_atual:
+        meses_validos = 12
+    else:
+        meses_validos = ultimo_mes
 
-    # 1. somar focos por ano (toda a série)
-    anual = df.groupby(anos)['focos'].sum().to_frame(name='focos_ano')
-
-    # 2. definir baseline histórico
+    df_valido = df[df['mes'] <= meses_validos]
+    
+    anual = df_valido.groupby('ano')['focos'].sum().to_frame(name='focos_ano')
+    
     hist = anual.loc[(anual.index >= ano_inicio) & (anual.index <= ano_fim)]
-
-    # 3. média e desvio do histórico
+    
     media_anual = hist['focos_ano'].mean()
     desvio_anual = hist['focos_ano'].std()
-
-    # 4. calcular z-score para todos os anos
+    
     anual['z_anual'] = (anual['focos_ano'] - media_anual) / desvio_anual
+    
+    return anual, media_anual, desvio_anual, meses_validos
 
-    return anual, media_anual, desvio_anual
+def nome_mes(numero_mes):
+    """
+    Retorna o nome do mês em português dado o número do mês (1 a 12).
+    """
+    meses_pt = [
+        '',  # placeholder para index 0
+        'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+        'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
+    ]
+    
+    if 1 <= numero_mes <= 12:
+        return meses_pt[numero_mes]
+    else:
+        return 'Mês inválido'

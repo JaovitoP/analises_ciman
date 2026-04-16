@@ -57,7 +57,6 @@ if st.session_state.get("gerar_relatorio_regioes"):
         resultados = []
         dados_graficos = []
 
-        st.subheader(f'📊 Relatório de {ano}')
         tabelas_regioes = {}
 
         for regiao in lista_regioes:
@@ -73,19 +72,21 @@ if st.session_state.get("gerar_relatorio_regioes"):
             df_focos = df_focos[df_focos.index.year <= date.today().year].copy()
 
             df_focos_var, stats = calcula_z_index(df_focos, ano_i, ano_f)
-            df_anual, media_anual, desvio_anual = calcula_z_anual(df_focos, ano_i, ano_f)
+            df_anual, media_anual, desvio_anual, mes_final = calcula_z_anual(df_focos, ano_i, ano_f, ano_selecionado=ano)
             df_anual_plot = df_anual
 
             tabela_regiao = tabelas_regioes[regiao]
 
             dados_graficos.append((regiao, df_anual_plot, media_anual, desvio_anual, tabela_regiao))
 
+        ano_atual = date.today().year
+        if ano == ano_atual:
+            st.subheader(f'📊 Relatório de {ano} (até {nome_mes(mes_final)})')
+        else:
+            st.subheader(f'📊 Relatório de {ano}')
+
         df_regioes = pd.DataFrame(resultados)
-        df_regioes[['Média histórica','Desvio histórico']] = (
-            df_regioes[['Média histórica','Desvio histórico']]
-            .round(0)
-            .astype('Int64')
-        )
+        df_regioes[['Média histórica','Desvio histórico']] = df_regioes[['Média histórica','Desvio histórico']].astype(int)
         num_cols = df_regioes.select_dtypes(include='number').columns
 
         df_regioes_style = (
@@ -106,7 +107,8 @@ if st.session_state.get("gerar_relatorio_regioes"):
                     media_anual,
                     desvio_anual,
                     ano_i,
-                    ano_f
+                    ano_f,
+                    ano_selecionado=ano
                 )
 
                 st.dataframe(tabela_regiao, use_container_width=True)

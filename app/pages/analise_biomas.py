@@ -11,6 +11,7 @@ lista_biomas = ["amazonia", "cerrado", "pantanal", "caatinga", "mata_atlantica",
 header()
 
 st.header('Analisador de focos por Biomas')
+
 with st.sidebar:
 
     ano = st.selectbox(
@@ -54,11 +55,8 @@ if st.session_state.get("gerar_relatorio_biomas"):
         resultados = []
         dados_graficos = []
 
-        st.subheader(f'📊 Relatório de {ano}')
         tabelas_biomas = {}
 
-
-        # Tabela
         for bioma in lista_biomas:
             df_focos = ajusta_serie_temporal(preparar_focos(f"biomas/{bioma}.csv"))
             df_focos = df_focos[df_focos.index.year <= date.today().year].copy()
@@ -67,27 +65,26 @@ if st.session_state.get("gerar_relatorio_biomas"):
             resultados.append(res)
             tabelas_biomas[bioma] = tabela_bioma
 
-
-        # Gráficos
         for bioma in biomas_selecionados:
             df_focos = ajusta_serie_temporal(preparar_focos(f"biomas/{bioma}.csv"))
             df_focos = df_focos[df_focos.index.year <= date.today().year].copy()
 
-            df_anual, media_anual, desvio_anual = calcula_z_anual(df_focos, ano_i, ano_f)
+            df_anual, media_anual, desvio_anual, mes_final = calcula_z_anual(df_focos, ano_i, ano_f, ano_selecionado=ano)
             df_anual_plot = df_anual
 
             tabela_bioma = tabelas_biomas[bioma]
 
             dados_graficos.append((bioma, df_anual_plot, media_anual, desvio_anual, tabela_bioma))
 
+        ano_atual = date.today().year
+        if ano == ano_atual:
+            st.subheader(f'📊 Relatório de {ano} (até {nome_mes(mes_final)})')
+        else:
+            st.subheader(f'📊 Relatório de {ano}')
+
         df_biomas = pd.DataFrame(resultados)
 
-        df_biomas[['Média histórica','Desvio histórico']] = (
-            df_biomas[['Média histórica','Desvio histórico']]
-            .round(0)
-            .astype('Int64')
-        )
-
+        df_biomas[['Média histórica','Desvio histórico']] = df_biomas[['Média histórica','Desvio histórico']].astype(int)
         num_cols = df_biomas.select_dtypes(include='number').columns
 
         df_biomas_style = (
@@ -109,7 +106,8 @@ if st.session_state.get("gerar_relatorio_biomas"):
                     media_anual,
                     desvio_anual,
                     ano_i,
-                    ano_f
+                    ano_f,
+                    ano_selecionado=ano
                 )
 
                 st.dataframe(tabela_bioma, use_container_width=True)

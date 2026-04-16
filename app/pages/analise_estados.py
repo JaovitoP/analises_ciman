@@ -18,6 +18,7 @@ lista_estados = [
 header()
 
 st.header('Analisador de focos por Estados')
+
 with st.sidebar:
 
     ano = st.selectbox(
@@ -63,8 +64,6 @@ if st.session_state.get("gerar_relatorio_estados"):
         dados_graficos = []
         tabelas_estados = {}
 
-
-        st.subheader(f'📊 Relatório de {ano}')
         for estado in lista_estados:
             df_focos = ajusta_serie_temporal(preparar_focos(f"estados/{estado}.csv"))
             df_focos = df_focos[df_focos.index.year <= date.today().year].copy()
@@ -77,19 +76,22 @@ if st.session_state.get("gerar_relatorio_estados"):
             df_focos = ajusta_serie_temporal(preparar_focos(f"estados/{estado}.csv"))
             df_focos_var, stats = calcula_z_index(df_focos, ano_i, ano_f)
             
-            df_anual, media_anual, desvio_anual = calcula_z_anual(df_focos, ano_i, ano_f)
+            df_anual, media_anual, desvio_anual, mes_final = calcula_z_anual(df_focos, ano_i, ano_f, ano_selecionado=ano)
             df_anual_plot = df_anual
 
             tabela_estado = tabelas_estados[estado]
 
             dados_graficos.append((estado, df_anual_plot, media_anual, desvio_anual, tabela_estado))
 
+        ano_atual = date.today().year
+        if ano == ano_atual:
+            st.subheader(f'📊 Relatório de {ano} (até {nome_mes(mes_final)})')
+        else:
+            st.subheader(f'📊 Relatório de {ano}')
+
         df_estados = pd.DataFrame(resultados)
-        df_estados[['Média histórica','Desvio histórico']] = (
-            df_estados[['Média histórica','Desvio histórico']]
-            .round(0)
-            .astype('Int64')
-        )
+
+        df_estados[['Média histórica','Desvio histórico']] = df_estados[['Média histórica','Desvio histórico']].astype(int)
         num_cols = df_estados.select_dtypes(include='number').columns
 
         df_estados_style = (
@@ -101,6 +103,7 @@ if st.session_state.get("gerar_relatorio_estados"):
         st.dataframe(df_estados_style)
 
         cols = st.columns(2)
+
         for i, (estado, df_anual_plot, media_anual, desvio_anual, tabela_estado) in enumerate(dados_graficos):
             col = cols[i % len(cols)]
             with col, st.container(border=True), st.spinner('Gerando gráfico...'):
@@ -110,7 +113,8 @@ if st.session_state.get("gerar_relatorio_estados"):
                     media_anual,
                     desvio_anual,
                     ano_i,
-                    ano_f
+                    ano_f,
+                    ano_selecionado=ano
                 )
 
                 st.dataframe(tabela_estado, use_container_width=True)
