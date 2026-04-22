@@ -8,6 +8,8 @@ from components.warnings import choose_ano_i_warning
 
 years = get_years()
 
+st.session_state["gerar_relatorio_brasil"] = True
+
 header()
 
 st.header('Analisador de focos no Brasil')
@@ -34,9 +36,6 @@ with st.sidebar:
         options=available_years,
         index=available_years.index(default_year) if default_year in available_years else 0
     )
-
-    if st.button('Gerar relatório'):
-        st.session_state["gerar_relatorio_brasil"] = True
 
 if st.session_state.get("gerar_relatorio_brasil"):
     if not ano_f:
@@ -75,5 +74,5 @@ if st.session_state.get("gerar_relatorio_brasil"):
         )
         st.dataframe(df_brasil_style)
 
-        with st.container(border=True):
-            plot_annual_graph(df_anual_plot, media_anual, desvio_anual, ano_i, ano_f, ano_selecionado=ano)
+    with st.container(border=True), st.spinner('Gerando gráfico...'):
+        plot_annual_graph(df_anual_plot, media_anual, desvio_anual, ano_i, ano_f, ano_selecionado=ano)

@@ -7,6 +7,8 @@ from components.warnings import choose_ano_i_warning
 
 years = get_years()
 
+st.session_state["gerar_relatorio_regioes"] = True
+
 lista_regioes = ["matopiba", "map", "amazonia_legal", "norte", "nordeste", "centro_oeste", "sul", "sudeste"]
 
 header()
@@ -42,17 +44,10 @@ with st.sidebar:
         format_func=lambda x: x.replace("_", " ").capitalize()
     )
 
-
-    if st.button('Gerar relatório'):
-        st.session_state["gerar_relatorio_regioes"] = True
-
 if st.session_state.get("gerar_relatorio_regioes"):
-    if not regioes_selecionadas:
-        st.warning("Selecione pelo menos uma região.")
-        st.stop()
     if not ano_f:
-            choose_ano_i_warning()
-    with st.spinner('Gerando relatório...'):
+        choose_ano_i_warning()
+    with st.spinner('Gerando tabela...'):
 
         resultados = []
         dados_graficos = []
@@ -67,24 +62,6 @@ if st.session_state.get("gerar_relatorio_regioes"):
             resultados.append(res)
             tabelas_regioes[regiao] = tabela_regiao
 
-        for regiao in regioes_selecionadas:
-            df_focos = ajusta_serie_temporal(preparar_focos(f'regioes/{regiao}.csv'))
-            df_focos = df_focos[df_focos.index.year <= date.today().year].copy()
-
-            df_focos_var, stats = calcula_z_index(df_focos, ano_i, ano_f)
-            df_anual, media_anual, desvio_anual, mes_final = calcula_z_anual(df_focos, ano_i, ano_f, ano_selecionado=ano)
-            df_anual_plot = df_anual
-
-            tabela_regiao = tabelas_regioes[regiao]
-
-            dados_graficos.append((regiao, df_anual_plot, media_anual, desvio_anual, tabela_regiao))
-
-        ano_atual = date.today().year
-        if ano == ano_atual:
-            st.subheader(f'📊 Relatório de {ano} (até {nome_mes(mes_final)})')
-        else:
-            st.subheader(f'📊 Relatório de {ano}')
-
         df_regioes = pd.DataFrame(resultados)
         df_regioes[['Média histórica','Desvio histórico']] = df_regioes[['Média histórica','Desvio histórico']].astype(int)
         num_cols = df_regioes.select_dtypes(include='number').columns
@@ -97,18 +74,39 @@ if st.session_state.get("gerar_relatorio_regioes"):
                 )
         st.dataframe(df_regioes_style)
 
-        cols = st.columns(2)
-        for i, (regiao, df_anual_plot, media_anual, desvio_anual, tabela_regiao) in enumerate(dados_graficos):
-            col = cols[i % len(cols)]
-            with col, st.container(border=True), st.spinner('Gerando gráfico...'):
-                plot_annual_regioes_graph(
-                    regiao,
-                    df_anual_plot,
-                    media_anual,
-                    desvio_anual,
-                    ano_i,
-                    ano_f,
-                    ano_selecionado=ano
-                )
+    if not regioes_selecionadas:
+        st.stop()
 
-                st.dataframe(tabela_regiao, use_container_width=True)
+    for regiao in regioes_selecionadas:
+        df_focos = ajusta_serie_temporal(preparar_focos(f'regioes/{regiao}.csv'))
+        df_focos = df_focos[df_focos.index.year <= date.today().year].copy()
+
+        df_focos_var, stats = calcula_z_index(df_focos, ano_i, ano_f)
+        df_anual, media_anual, desvio_anual, mes_final = calcula_z_anual(df_focos, ano_i, ano_f, ano_selecionado=ano)
+        df_anual_plot = df_anual
+
+        tabela_regiao = tabelas_regioes[regiao]
+
+        dados_graficos.append((regiao, df_anual_plot, media_anual, desvio_anual, tabela_regiao))
+
+    ano_atual = date.today().year
+    if ano == ano_atual:
+        st.subheader(f'📊 Relatório de {ano} (até {nome_mes(mes_final)})')
+    else:
+        st.subheader(f'📊 Relatório de {ano}')
+
+    cols = st.columns(2)
+    for i, (regiao, df_anual_plot, media_anual, desvio_anual, tabela_regiao) in enumerate(dados_graficos):
+        col = cols[i % len(cols)]
+        with col, st.container(border=True), st.spinner('Gerando gráfico...'):
+            plot_annual_regioes_graph(
+                regiao,
+                df_anual_plot,
+                media_anual,
+                desvio_anual,
+                ano_i,
+                ano_f,
+                ano_selecionado=ano
+            )
+
+            st.dataframe(tabela_regiao, use_container_width=True)

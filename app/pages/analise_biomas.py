@@ -8,6 +8,8 @@ from components.warnings import choose_ano_i_warning
 years = get_years()
 lista_biomas = ["amazonia", "cerrado", "pantanal", "caatinga", "mata_atlantica","pampa"]
 
+st.session_state["gerar_relatorio_biomas"] = True
+
 header()
 
 st.header('Analisador de focos por Biomas')
@@ -42,15 +44,10 @@ with st.sidebar:
         format_func= lambda x: x.replace("_", " ").capitalize()
     )
 
-    if st.button('Gerar relatório'):
-        st.session_state["gerar_relatorio_biomas"] = True
 if st.session_state.get("gerar_relatorio_biomas"):
-    if not biomas_selecionados:
-        st.warning("Selecione pelo menos um bioma.")
-        st.stop()
     if not ano_f:
         choose_ano_i_warning()
-    with st.spinner('Gerando relatório...'):
+    with st.spinner('Gerando Tabela...'):
 
         resultados = []
         dados_graficos = []
@@ -65,7 +62,26 @@ if st.session_state.get("gerar_relatorio_biomas"):
             resultados.append(res)
             tabelas_biomas[bioma] = tabela_bioma
 
+        
+        df_biomas = pd.DataFrame(resultados)
+
+        df_biomas[['Média histórica','Desvio histórico']] = df_biomas[['Média histórica','Desvio histórico']].astype(int)
+        num_cols = df_biomas.select_dtypes(include='number').columns
+
+        df_biomas_style = (
+            df_biomas
+            .style
+            .apply(cor_linha, axis=1, ano=ano)
+            .format({col: formato_br for col in num_cols})
+        )
+        st.dataframe(df_biomas_style)
+
+    if not biomas_selecionados:
+        st.stop()
+
+    with st.spinner('Gerando Tabela...'):
         for bioma in biomas_selecionados:
+
             df_focos = ajusta_serie_temporal(preparar_focos(f"biomas/{bioma}.csv"))
             df_focos = df_focos[df_focos.index.year <= date.today().year].copy()
 
@@ -81,34 +97,21 @@ if st.session_state.get("gerar_relatorio_biomas"):
             st.subheader(f'📊 Relatório de {ano} (até {nome_mes(mes_final)})')
         else:
             st.subheader(f'📊 Relatório de {ano}')
+            
+    cols = st.columns(2)
 
-        df_biomas = pd.DataFrame(resultados)
+    for i, (bioma, df_anual_plot, media_anual, desvio_anual, tabela_bioma) in enumerate(dados_graficos):
+        col = cols[i % len(cols)]
+        with col, st.container(border=True), st.spinner('Gerando gráfico...'):
+            plot_annual_biomas_graph(
+                bioma,
+                df_anual_plot,
+                media_anual,
+                desvio_anual,
+                ano_i,
+                ano_f,
+                ano_selecionado=ano
+            )
 
-        df_biomas[['Média histórica','Desvio histórico']] = df_biomas[['Média histórica','Desvio histórico']].astype(int)
-        num_cols = df_biomas.select_dtypes(include='number').columns
-
-        df_biomas_style = (
-            df_biomas
-            .style
-            .apply(cor_linha, axis=1, ano=ano)
-            .format({col: formato_br for col in num_cols})
-        )
-        st.dataframe(df_biomas_style)
-
-        cols = st.columns(2)
-
-        for i, (bioma, df_anual_plot, media_anual, desvio_anual, tabela_bioma) in enumerate(dados_graficos):
-            col = cols[i % len(cols)]
-            with col, st.container(border=True), st.spinner('Gerando gráfico...'):
-                plot_annual_biomas_graph(
-                    bioma,
-                    df_anual_plot,
-                    media_anual,
-                    desvio_anual,
-                    ano_i,
-                    ano_f,
-                    ano_selecionado=ano
-                )
-
-                st.dataframe(tabela_bioma, use_container_width=True)
+            st.dataframe(tabela_bioma, use_container_width=True)
 
