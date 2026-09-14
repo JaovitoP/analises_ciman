@@ -26,6 +26,11 @@ def preparar_focos(link):
   df_focos = df_focos.melt(id_vars=["Ano"], var_name="mes", value_name="focos")
   df_focos.columns = df_focos.columns.str.lower()
 
+  df_focos["focos"] = pd.to_numeric(
+    df_focos["focos"],
+    errors="coerce"
+)
+
   return df_focos
 
 def ajusta_serie_temporal(df_focos):
