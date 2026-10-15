@@ -17,8 +17,13 @@ regioes_formatadas = {
     'sul': 'Sul',
     'sudeste': 'Sudeste'
 }
+
+def caminho_arquivo_regiao(regiao):
+    pasta = "regioes_especiais" if regiao in {"matopiba", "map", "amazonia_legal"} else "regioes"
+    return f"{pasta}/{regiao}.csv"
+
 def analisador_regiao(regiao, ano, ano_i, ano_f):
-    url_focos_regiao = f"regioes/{regiao}.csv"
+    url_focos_regiao = caminho_arquivo_regiao(regiao)
     df_focos = ajusta_serie_temporal( preparar_focos(url_focos_regiao) )
     df_focos = df_focos[df_focos.index.year <= date.today().year].copy() #até
     regiao_nome = regioes_formatadas.get(regiao, regiao)

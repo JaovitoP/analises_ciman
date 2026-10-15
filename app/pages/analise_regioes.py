@@ -55,7 +55,7 @@ if st.session_state.get("gerar_relatorio_regioes"):
         tabelas_regioes = {}
 
         for regiao in lista_regioes:
-            df_focos = ajusta_serie_temporal(preparar_focos(f'regioes/{regiao}.csv'))
+            df_focos = ajusta_serie_temporal(preparar_focos(caminho_arquivo_regiao(regiao)))
             df_focos = df_focos[df_focos.index.year <= date.today().year].copy()
 
             res, tabela_regiao = analisador_regiao(regiao, ano, ano_i, ano_f)
@@ -78,7 +78,7 @@ if st.session_state.get("gerar_relatorio_regioes"):
         st.stop()
 
     for regiao in regioes_selecionadas:
-        df_focos = ajusta_serie_temporal(preparar_focos(f'regioes/{regiao}.csv'))
+        df_focos = ajusta_serie_temporal(preparar_focos(caminho_arquivo_regiao(regiao)))
         df_focos = df_focos[df_focos.index.year <= date.today().year].copy()
 
         df_focos_var, stats = calcula_z_index(df_focos, ano_i, ano_f)
