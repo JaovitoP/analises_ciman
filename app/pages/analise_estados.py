@@ -61,9 +61,6 @@ if st.session_state.get("gerar_relatorio_estados"):
         tabelas_estados = {}
 
         for estado in lista_estados:
-            df_focos = ajusta_serie_temporal(preparar_focos(f"estados/{estado}.csv"))
-            df_focos = df_focos[df_focos.index.year <= date.today().year].copy()
-
             res, tabela_estado = analisador_estado(estado, ano, ano_i, ano_f)
             resultados.append(res)
             tabelas_estados[estado] = tabela_estado

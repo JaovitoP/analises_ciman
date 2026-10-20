@@ -1,37 +1,29 @@
-#bibliotecas
 from datetime import date, datetime
-import pandas as pd
-import matplotlib.image as mpimg
-import urllib.request
-import os # Import os module to handle file cleanup
-import pandas as pd
+
 import numpy as np
-import matplotlib.patches as mpatches
+import pandas as pd
 import streamlit as st
 
-url_base = 'https://data.inpe.br/queimadas/portal/csv/download/historico-mensal/'
+from utils.data_pipeline import processed_data_path
 
 
 def get_years():
-    return [year for year in range(1998, 2027)]
+    return list(range(1998, date.today().year + 1))
+
+
+@st.cache_data(show_spinner=False)
+def _read_processed_focos(path, modified_at):
+  return pd.read_csv(path)
+
 
 def preparar_focos(link):
-  # Faz a leitura do arquivo CSV direto da URL
-  df_focos = pd.read_csv(url_base+link)
-
-  # Eliminar as 3 ultimas linhas
-  df_focos = df_focos.iloc[:-3, :-1].copy()
-
-  # converter o dataframe para tres colunas utilizando o melt
-  df_focos = df_focos.melt(id_vars=["Ano"], var_name="mes", value_name="focos")
-  df_focos.columns = df_focos.columns.str.lower()
-
-  df_focos["focos"] = pd.to_numeric(
-    df_focos["focos"],
-    errors="coerce"
-)
-
-  return df_focos
+  path = processed_data_path(link)
+  if not path.is_file():
+    raise FileNotFoundError(
+      f"Dados locais ausentes para {link}. Execute 'python update_data.py' "
+      "no diretório app antes de iniciar a aplicação."
+    )
+  return _read_processed_focos(str(path), path.stat().st_mtime_ns)
 
 def ajusta_serie_temporal(df_focos):
   # Mapear os nomes dos meses em português para números

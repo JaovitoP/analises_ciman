@@ -55,9 +55,6 @@ if st.session_state.get("gerar_relatorio_biomas"):
         tabelas_biomas = {}
 
         for bioma in lista_biomas:
-            df_focos = ajusta_serie_temporal(preparar_focos(f"biomas/{bioma}.csv"))
-            df_focos = df_focos[df_focos.index.year <= date.today().year].copy()
-
             res, tabela_bioma = analisador_bioma(bioma, ano, ano_i, ano_f)
             resultados.append(res)
             tabelas_biomas[bioma] = tabela_bioma
@@ -114,4 +111,3 @@ if st.session_state.get("gerar_relatorio_biomas"):
             )
 
             st.dataframe(tabela_bioma, use_container_width=True)
-

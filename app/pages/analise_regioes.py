@@ -55,9 +55,6 @@ if st.session_state.get("gerar_relatorio_regioes"):
         tabelas_regioes = {}
 
         for regiao in lista_regioes:
-            df_focos = ajusta_serie_temporal(preparar_focos(caminho_arquivo_regiao(regiao)))
-            df_focos = df_focos[df_focos.index.year <= date.today().year].copy()
-
             res, tabela_regiao = analisador_regiao(regiao, ano, ano_i, ano_f)
             resultados.append(res)
             tabelas_regioes[regiao] = tabela_regiao

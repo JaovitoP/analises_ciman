@@ -73,5 +73,21 @@ source .venv/bin/activate
 
 pip install -r requirements.txt
 
+# Baixar e processar os dados antes da primeira execução
+python update_data.py
+
 streamlit run streamlit_app.py # A aplicação abrirá no endereço http://localhost:8501
+```
+
+#### **Atualização dos dados**
+
+A aplicação lê os CSVs processados localmente e não baixa dados durante a navegação.
+Para manter os dados atualizados, agende `python update_data.py` diariamente no
+servidor, usando cron ou o agendador de tarefas do ambiente. A rotina baixa e
+valida todos os arquivos antes de substituir os dados locais; se uma fonte falhar,
+os arquivos atuais são preservados. Execute o comando no diretório `app`. Exemplo
+de agendamento diário às 3h com cron:
+
+```cron
+0 3 * * * cd /caminho/para/analises_ciman/app && /caminho/para/ambiente/bin/python update_data.py >> /caminho/para/atualizacao.log 2>&1
 ```
