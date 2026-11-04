@@ -1,0 +1,35 @@
+Gerado em: 2026-11-04 14:14:20
+Arquivo base: /dados/painel_focos_joao/teste/resultados/run-20261104_140713/resumo.csv
+
+As linhas abaixo usam as mesmas colunas do resumo.csv.
+
+Top 5 por CPU média (%):
+container,name,cpu_avg_pct,cpu_max_pct
+04ce5f0de5fc,painel_focos_joao-k6-run-a803c89a9d3b,239.33,456.54
+2fb4b55f014c,painel-focos-app,118.24,200.74
+0311b97cedcf,mapia30m_refactor-broker-1,0.85,3.14
+02b46d125670,mapia30m_refactor-api-1,0.61,0.74
+4f50f89fde45,mapia30m_refactor-db-1,0.53,3.87
+
+Top 5 por RAM média (bytes):
+container,name,mem_avg_bytes,mem_max_bytes
+1de8101340a2,mapia30m_refactor-task_manager-1,2652142305,2652142305
+2fb4b55f014c,painel-focos-app,1904630001,2750926553
+04ce5f0de5fc,painel_focos_joao-k6-run-a803c89a9d3b,665866149,878077542
+02b46d125670,mapia30m_refactor-api-1,527538586,527538586
+a2ee2746197a,streamlit-app,355886694,355886694
+
+Top 5 por Block Write delta (bytes):
+container,name,block_write_delta_bytes,block_read_delta_bytes
+04ce5f0de5fc,painel_focos_joao-k6-run-a803c89a9d3b,247550000,0
+2fb4b55f014c,painel-focos-app,32800,0
+d1b64a497572,dashboard-mapia,0,0
+
+Top 5 por Net TX delta (bytes):
+container,name,net_tx_delta_bytes,net_rx_delta_bytes
+2fb4b55f014c,painel-focos-app,756340000,12304700
+04ce5f0de5fc,painel_focos_joao-k6-run-a803c89a9d3b,22757000,841770000
+1de8101340a2,mapia30m_refactor-task_manager-1,300000,0
+93b5bfde119c,mapia30m_refactor-dashboard-1,69000,184000
+b99c1b96e286,mapia30m_refactor-beat-1,300,300
+

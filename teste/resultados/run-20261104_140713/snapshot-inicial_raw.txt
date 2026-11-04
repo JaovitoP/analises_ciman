@@ -1,0 +1,12 @@
+CONTAINER ID   NAME                               CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O     PIDS
+2fb4b55f014c   painel-focos-app                   0.37%     49.73MiB / 6GiB      0.81%     1.67kB / 724B     0B / 0B       6
+b99c1b96e286   mapia30m_refactor-beat-1           0.00%     295MiB / 62.8GiB     0.46%     22.1kB / 14.3kB   0B / 28.7kB   23
+93b5bfde119c   mapia30m_refactor-dashboard-1      0.26%     49.71MiB / 62.8GiB   0.08%     764kB / 321kB     0B / 0B       10
+1de8101340a2   mapia30m_refactor-task_manager-1   0.27%     2.47GiB / 62.8GiB    3.93%     1.67GB / 22.7MB   0B / 1.1GB    35
+02b46d125670   mapia30m_refactor-api-1            0.49%     503.1MiB / 62.8GiB   0.78%     48.9MB / 862MB    0B / 1.19GB   36
+4258c967c7bc   mapia30m_refactor-mapserver-1      0.00%     1.684MiB / 62.8GiB   0.00%     1.83kB / 126B     0B / 36.9kB   2
+4f50f89fde45   mapia30m_refactor-db-1             0.00%     17.62MiB / 62.8GiB   0.03%     2.17kB / 126B     0B / 225kB    6
+d20dcb7e0245   mapia30m-viewer-app-1              0.12%     207.7MiB / 62.8GiB   0.32%     945kB / 23.5MB    0B / 8.19kB   34
+0311b97cedcf   mapia30m_refactor-broker-1         0.23%     7.793MiB / 62.8GiB   0.01%     997MB / 1.43GB    0B / 34.5MB   6
+a2ee2746197a   streamlit-app                      0.35%     339.4MiB / 62.8GiB   0.53%     9.3MB / 32.2MB    0B / 0B       15
+d1b64a497572   dashboard-mapia                    0.42%     92.07MiB / 62.8GiB   0.14%     44.2kB / 766B     48.3MB / 0B   5

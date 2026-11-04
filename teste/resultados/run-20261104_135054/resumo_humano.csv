@@ -1,0 +1,13 @@
+container,name,samples,cpu_avg_pct,cpu_max_pct,mem_avg,mem_max,mem_limit_max,mem_pct_avg,mem_pct_max,net_rx_delta,net_tx_delta,block_read_delta,block_write_delta,pids_max
+d1b64a497572,dashboard-mapia,84,0.52,0.59,96.54MB,96.54MB,67.43GB,0.14,0.14,0B,0B,0B,0B,5
+4f50f89fde45,mapia30m_refactor-db-1,84,0.66,3.62,18.50MB,20.39MB,67.43GB,0.03,0.03,0B,0B,0B,0B,12
+a2ee2746197a,streamlit-app,84,0.41,0.49,355.89MB,355.89MB,67.43GB,0.53,0.53,0B,0B,0B,0B,15
+0311b97cedcf,mapia30m_refactor-broker-1,84,0.86,3.16,8.24MB,9.81MB,67.43GB,0.01,0.01,1.00MB,0B,0B,0B,12
+b99c1b96e286,mapia30m_refactor-beat-1,84,0.00,0.00,309.33MB,309.33MB,67.43GB,0.46,0.46,400B,300B,0B,0B,23
+d20dcb7e0245,mapia30m-viewer-app-1,84,0.11,0.86,217.95MB,218.52MB,67.43GB,0.32,0.32,2.00kB,0B,0B,0B,34
+155b87c6a43e,painel_focos_joao-k6-run-7b08f8627d35,72,246.22,479.88,663.27MB,876.19MB,67.43GB,0.98,1.30,886.75MB,24.05MB,123.00kB,281.55MB,943
+93b5bfde119c,mapia30m_refactor-dashboard-1,84,0.13,0.27,52.12MB,52.12MB,67.43GB,0.08,0.08,183.00kB,69.00kB,0B,0B,10
+02b46d125670,mapia30m_refactor-api-1,84,0.60,0.70,527.54MB,527.54MB,67.43GB,0.78,0.78,0B,0B,0B,0B,36
+4258c967c7bc,mapia30m_refactor-mapserver-1,84,0.00,0.01,1.77MB,1.77MB,67.43GB,0.00,0.00,70B,0B,0B,0B,2
+23c207b91fa6,painel-focos-app,84,107.24,198.56,1.02GB,2.12GB,2.15GB,47.42,98.79,12.95MB,793.34MB,32.80kB,32.80kB,70
+1de8101340a2,mapia30m_refactor-task_manager-1,84,0.27,0.49,2.65GB,2.65GB,67.43GB,3.93,3.93,0B,300.00kB,0B,0B,35

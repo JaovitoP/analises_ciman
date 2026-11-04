@@ -1,0 +1,20 @@
+{
+  "users_configured": 3,
+  "page": "all",
+  "interactions": false,
+  "ramp_up": "30s",
+  "hold": "5m",
+  "ramp_down": "30s",
+  "app_cpu_avg_pct": 118.24,
+  "app_cpu_max_pct": 200.74,
+  "app_memory_avg_bytes": 1904630001,
+  "app_memory_max_bytes": 2750926553,
+  "app_memory_max_pct": 42.7,
+  "app_pids_max": 87,
+  "app_memory_reset_events": 0,
+  "k6_vus_max": 3,
+  "k6_iterations": 142,
+  "k6_checks_rate": 1,
+  "k6_http_failed_rate": 0,
+  "k6_fcp_p95_ms": 5840
+}

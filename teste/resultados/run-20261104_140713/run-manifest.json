@@ -1,0 +1,15 @@
+{
+  "run_directory": "run-20261104_140713",
+  "host": "qmd-vm-mapia30-as",
+  "base_url": "http://painel-focos-app:8501",
+  "page": "all",
+  "interactions": "0",
+  "configured_vus": "3",
+  "ramp_up": "30s",
+  "hold": "5m",
+  "ramp_down": "30s",
+  "monitor_duration": "420",
+  "monitor_interval": "5",
+  "app_memory_limit": "1g",
+  "app_cpu_limit": "2.0"
+}
