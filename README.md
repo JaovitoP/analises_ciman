@@ -79,6 +79,20 @@ python update_data.py
 streamlit run streamlit_app.py # A aplicação abrirá no endereço http://localhost:8501
 ```
 
+#### **Executando com Docker**
+
+Na raiz do projeto, construa e inicie o container:
+
+```bash
+docker compose up -d --build
+```
+
+A aplicação ficará disponível em `http://localhost:8501`. O container possui
+healthcheck e os limites de recurso podem ser ajustados com
+`APP_MEMORY_LIMIT` e `APP_CPU_LIMIT`.
+
+Para o procedimento de carga e estresse, consulte [`teste/README.md`](teste/README.md).
+
 #### **Atualização dos dados**
 
 A aplicação lê os CSVs processados localmente e não baixa dados durante a navegação.

@@ -1,0 +1,12 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: painel-focos-app
+    ports:
+      - "${APP_PORT:-8501}:8501"
+    init: true
+    restart: unless-stopped
+    mem_limit: ${APP_MEMORY_LIMIT:-1g}
+    cpus: ${APP_CPU_LIMIT:-2.0}

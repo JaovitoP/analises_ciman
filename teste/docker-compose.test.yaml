@@ -1,0 +1,21 @@
+services:
+  k6:
+    image: grafana/k6:latest-with-browser
+    profiles:
+      - load-test
+    environment:
+      BASE_URL: ${TEST_BASE_URL:-http://painel-focos-app:8501}
+      TEST_PAGE: ${TEST_PAGE:-all}
+      TEST_INTERACTIONS: ${TEST_INTERACTIONS:-0}
+      TEST_VUS: ${TEST_VUS:-10}
+      TEST_RAMP_UP: ${TEST_RAMP_UP:-2m}
+      TEST_HOLD: ${TEST_HOLD:-5m}
+      TEST_RAMP_DOWN: ${TEST_RAMP_DOWN:-1m}
+      TEST_RESULTS_DIR: ${TEST_RESULTS_DIR:-/results}
+    volumes:
+      - ./teste/k6:/scripts:ro
+      - ./teste/resultados:/results
+    depends_on:
+      app:
+        condition: service_healthy
+    command: ["run", "/scripts/stress.js"]
